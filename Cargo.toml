@@ -5,4 +5,6 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.95"
+polars = { version = "0.38.0", features = ["csv"] }
 reqwest = { version = "0.12.12", features = ["blocking"] }
+xgboost = "0.1.4"
