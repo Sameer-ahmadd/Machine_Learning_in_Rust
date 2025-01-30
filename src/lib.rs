@@ -22,6 +22,7 @@ pub fn download_csv_file() -> anyhow::Result<String> {
 
 use std::vec;
 
+use anyhow::Ok;
 use polars::{prelude::*, series};
 
 pub fn load_csv_file(file_path: &str) -> anyhow::Result<DataFrame> {
@@ -72,4 +73,23 @@ pub fn train_test_split(
     println!("Testing set size: {}", test_df.height());
 
     Ok((train_df, test_df))
+}
+
+// Spliting the data into features and targets..
+
+pub fn split_features_and_target(df: &DataFrame) -> anyhow::Result<(DataFrame, DataFrame)> {
+    // features names
+    let features_names = vec![
+        "crim", "zn", "indus", "chas", "nox", "rm", "age", "dis", "rad", "tax", "ptratio", "b",
+        "lstat",
+    ];
+
+    // target names
+
+    let target_name = vec!["medv"];
+
+    let features = df.select(&features_names)?;
+    let target = df.select(&target_name)?;
+
+    Ok((features, target))
 }

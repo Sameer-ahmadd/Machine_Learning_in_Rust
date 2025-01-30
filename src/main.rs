@@ -1,4 +1,6 @@
-use house_price_predictor::{download_csv_file, load_csv_file, train_test_split};
+use house_price_predictor::{
+    download_csv_file, load_csv_file, split_features_and_target, train_test_split,
+};
 
 // Training Script entry point...
 // steps
@@ -22,6 +24,10 @@ fn main() -> anyhow::Result<()> {
     //3. Randomly spliting the data into training and testing sets.
 
     let (train_data, test_data) = train_test_split(&df, 0.2)?;
+
+    // 4. Splitting Data into features and targets.
+    let (x_train, y_train) = split_features_and_target(&train_data)?;
+    let (x_test, y_test) = split_features_and_target(&test_data)?;
 
     Ok(())
 }
