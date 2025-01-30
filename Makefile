@@ -1,6 +1,5 @@
 run-dev:
-     cargo run
+	cargo run
 
-run-realse:
-    cargo run --release \
-    ./target/debug/house-price-predictor
+run-release:
+	cargo run --release  # This line uses a tab for indentation

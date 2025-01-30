@@ -1,4 +1,4 @@
-use house_price_predictor::{download_csv_file, load_csv_file};
+use house_price_predictor::{download_csv_file, load_csv_file, train_test_split};
 
 // Training Script entry point...
 // steps
@@ -18,6 +18,10 @@ fn main() -> anyhow::Result<()> {
     // 2. Load the Data from disk into memory
 
     let df = load_csv_file(&csv_file_path)?;
+
+    //3. Randomly spliting the data into training and testing sets.
+
+    let (train_data, test_data) = train_test_split(&df, 0.2)?;
 
     Ok(())
 }
