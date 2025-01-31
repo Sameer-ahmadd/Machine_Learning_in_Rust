@@ -1,5 +1,7 @@
+use anyhow::Ok;
 use house_price_predictor::{
     download_csv_file, load_csv_file, split_features_and_target, train_test_split,
+    train_xgboost_model,
 };
 
 // Training Script entry point...
@@ -28,6 +30,9 @@ fn main() -> anyhow::Result<()> {
     // 4. Splitting Data into features and targets.
     let (x_train, y_train) = split_features_and_target(&train_data)?;
     let (x_test, y_test) = split_features_and_target(&test_data)?;
+
+    // 5. Training a xgboost model.
+    let path_to_model = train_xgboost_model(&x_train, &y_train, &x_test, &y_test)?;
 
     Ok(())
 }
