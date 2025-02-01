@@ -1,5 +1,7 @@
 // importing all the common functions we used along our project
 use anyhow::Ok;
+use aws_config::meta::region::RegionProviderChain;
+use aws_sdk_s3::Client;
 use polars::{prelude::*, series};
 use std::vec;
 use xgboost::{parameters, Booster, DMatrix};
@@ -157,4 +159,34 @@ pub fn train_xgboost_model(
     println!("Model saved to {}", model_path);
 
     Ok(model_path.to_string())
+}
+
+pub async fn pushes_model_to_s3(path_to_model: &str) -> anyhow::Result<()> {
+    let region_provider = RegionProviderChain::default_provider().or_else("us-west-2");
+    let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
+        .region(region_provider)
+        .load()
+        .await;
+
+    // Create an S3 client so i can talk to S3.
+
+    let client = Client::new(&config);
+
+    // Load the model file into memory
+    let model_file_bytes = std::fs::read(path_to_model)?;
+
+    // Upload the model file to the S3 bucket
+    // TODO: make this value a parameter to this function
+    let bucket_name = "xgboost-rust";
+    let key = "boston_housing_model.bin";
+
+    let _result = client
+        .put_object()
+        .bucket(bucket_name)
+        .key(key)
+        .body(model_file_bytes.into())
+        .send()
+        .await?;
+
+    Ok(())
 }

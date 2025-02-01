@@ -1,8 +1,9 @@
 use anyhow::Ok;
 use house_price_predictor::{
-    download_csv_file, load_csv_file, split_features_and_target, train_test_split,
-    train_xgboost_model,
+    download_csv_file, load_csv_file, pushes_model_to_s3, split_features_and_target,
+    train_test_split, train_xgboost_model,
 };
+use tokio::runtime;
 
 // Training Script entry point...
 // steps
@@ -33,6 +34,12 @@ fn main() -> anyhow::Result<()> {
 
     // 5. Training a xgboost model.
     let path_to_model = train_xgboost_model(&x_train, &y_train, &x_test, &y_test)?;
+
+    // 6. Pushes the model to S3 bucket.
+
+    let runtime = tokio::runtime::Runtime::new()?;
+    runtime.block_on(pushes_model_to_s3(&path_to_model))?;
+    println!("Pushes Model to S3 Bucket.");
 
     Ok(())
 }
