@@ -1,5 +1,8 @@
-run-dev:
-	cargo run
+run-training-dev:
+	cargo run --bin train
 
-run-release:
-	cargo run --release  # This line uses a tab for indentation
+run-api-dev:
+	cargo run --bin api
+
+run-request-health:
+	curl http://localhost:8080/health
