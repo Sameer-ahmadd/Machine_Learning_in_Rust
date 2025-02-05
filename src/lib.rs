@@ -161,6 +161,8 @@ pub fn train_xgboost_model(
     Ok(model_path.to_string())
 }
 
+// Pushes the model to S3 Bucket.
+
 pub async fn pushes_model_to_s3(path_to_model: &str) -> anyhow::Result<()> {
     let region_provider = RegionProviderChain::default_provider().or_else("us-west-2");
     let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
@@ -189,4 +191,35 @@ pub async fn pushes_model_to_s3(path_to_model: &str) -> anyhow::Result<()> {
         .await?;
 
     Ok(())
+}
+
+/// Download the model from S3 Bucket into memory.
+pub async fn download_model_from_s3() -> anyhow::Result<(String)> {
+    let region_provider = RegionProviderChain::default_provider().or_else("us-west-2");
+    let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
+        .region(region_provider)
+        .load()
+        .await;
+
+    // Create an S3 client so i can talk to S3.
+
+    let client = Client::new(&config);
+
+    let bucket_name = "xgboost-rust";
+    let key = "boston_housing_model.bin";
+
+    // First we download the content of the model file from S3 into memory
+    let download_path = "downloaded_model.bin";
+    let resp = client
+        .get_object()
+        .bucket(bucket_name)
+        .key(key)
+        .send()
+        .await?;
+    let data = resp.body.collect().await?.into_bytes();
+
+    // Save the downloaded bytes to a file on disk
+    std::fs::write(download_path, data)?;
+
+    Ok(download_path.to_string())
 }

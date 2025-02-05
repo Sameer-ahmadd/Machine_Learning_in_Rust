@@ -1,4 +1,5 @@
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use house_price_predictor::download_model_from_s3;
 use log::{info, warn};
 use serde::Deserialize;
 
@@ -37,10 +38,13 @@ async fn predict(payload: web::Json<PredictRequest>) -> impl Responder {
 }
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> anyhow::Result<()> {
     // Initialize logger
 
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+
+    // Dowloading the model from s3 Bucket as a local file.
+    let model_path = download_model_from_s3().await?;
 
     info!("Starting the API...");
 
