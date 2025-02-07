@@ -1,7 +1,16 @@
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
-use house_price_predictor::download_model_from_s3;
-use log::{info, warn};
+use clap::Parser;
+use house_price_predictor::aws::download_model_from_s3;
+use log::info;
 use serde::Deserialize;
+
+#[derive(Parser)]
+struct Args {
+    #[arg(short, long)]
+    bucket_name_s3: String,
+    #[arg(short, long)]
+    key_s3: String,
+}
 
 // Health check endpint
 // Returns an 200 Ok response if the API is healthy.
@@ -44,7 +53,8 @@ async fn main() -> anyhow::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
     // Dowloading the model from s3 Bucket as a local file.
-    let model_path = download_model_from_s3().await?;
+    let args = Args::parse();
+    let model_path = download_model_from_s3(&args.bucket_name_s3, &args.key_s3).await?;
 
     info!("Starting the API...");
 

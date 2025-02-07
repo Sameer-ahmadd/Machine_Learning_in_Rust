@@ -1,9 +1,18 @@
 use anyhow::Ok;
-use house_price_predictor::{
-    download_csv_file, load_csv_file, pushes_model_to_s3, split_features_and_target,
-    train_test_split, train_xgboost_model,
+use clap::Parser;
+use house_price_predictor::aws::pushes_model_to_s3;
+use house_price_predictor::data::{
+    download_csv_file, load_csv_file, split_features_and_target, train_test_split,
 };
-use tokio::runtime;
+use house_price_predictor::model::train_xgboost_model;
+
+#[derive(Parser)]
+struct Args {
+    #[arg(short, long)]
+    bucket_name_s3: String,
+    #[arg(short, long)]
+    key_s3: String,
+}
 
 // Training Script entry point...
 // steps
@@ -15,6 +24,7 @@ use tokio::runtime;
 
 // function to print sum of two numbers
 fn main() -> anyhow::Result<()> {
+    let args = Args::parse();
     println!("Starting the training script...");
 
     // 1. Download the CSV file to the disk
@@ -38,7 +48,11 @@ fn main() -> anyhow::Result<()> {
     // 6. Pushes the model to S3 bucket.
 
     let runtime = tokio::runtime::Runtime::new()?;
-    runtime.block_on(pushes_model_to_s3(&path_to_model))?;
+    runtime.block_on(pushes_model_to_s3(
+        &path_to_model,
+        &args.bucket_name_s3,
+        &args.key_s3,
+    ))?;
     println!("Pushes Model to S3 Bucket.");
 
     Ok(())

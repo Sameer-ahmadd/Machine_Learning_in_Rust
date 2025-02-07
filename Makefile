@@ -1,8 +1,14 @@
 run-training-dev:
-	cargo run --bin train
+	cargo run --bin train -- \
+		--bucket-name-s3 "xgboost-rust" \
+		--key-s3 "boston_housing_model.bin"
+
 
 run-api-dev:
-	cargo run --bin api
+	cargo run --bin api -- \
+		--bucket-name-s3 "xgboost-rust" \
+		--key-s3 "boston_housing_model.bin"
+
 
 request-health:
 	curl http://localhost:8080/health
