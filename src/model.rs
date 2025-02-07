@@ -1,5 +1,6 @@
 use polars::prelude::*;
 use xgboost::{parameters, Booster, DMatrix};
+
 pub fn train_xgboost_model(
     x_train: &DataFrame,
     y_train: &DataFrame,
@@ -65,4 +66,10 @@ pub fn train_xgboost_model(
     println!("Model saved to {}", model_path);
 
     Ok(model_path.to_string())
+}
+
+/// Loads a saved XGBoost model from a binary file
+pub fn load_xgboost_model(model_path: &str) -> anyhow::Result<Booster> {
+    let model = Booster::load(model_path)?;
+    Ok(model)
 }

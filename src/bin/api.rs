@@ -1,6 +1,6 @@
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use clap::Parser;
-use house_price_predictor::aws::download_model_from_s3;
+use house_price_predictor::{aws::download_model_from_s3, model::load_xgboost_model};
 use log::info;
 use serde::Deserialize;
 
@@ -55,6 +55,9 @@ async fn main() -> anyhow::Result<()> {
     // Dowloading the model from s3 Bucket as a local file.
     let args = Args::parse();
     let model_path = download_model_from_s3(&args.bucket_name_s3, &args.key_s3).await?;
+
+    // Loading the model from binary.
+    let model = load_xgboost_model(&model_path)?;
 
     info!("Starting the API...");
 
