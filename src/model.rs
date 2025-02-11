@@ -1,6 +1,12 @@
 use polars::prelude::*;
 use xgboost::{parameters, Booster, DMatrix};
 
+pub type Model = Booster;
+
+/// Trains an XGBoost model with the given training data
+/// Evaluates its performance with the test data, and
+/// Saves the model locally and returns a path to the generate model file
+
 pub fn train_xgboost_model(
     x_train: &DataFrame,
     y_train: &DataFrame,
